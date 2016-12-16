@@ -1,0 +1,71 @@
+<!DOCTYPE HTML >
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" >
+		<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+	<script src="../jquery-easyui-1.5/jquery.min.js" charset="utf-8"></script>
+		
+	<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=dcFP41BoCqemHDhIy00zcPX1Pgu7MKUV"></script>
+    
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+    
+    <style type="text/css">  
+    	*{margin: 0;padding: 0}
+    	html{height:100%}
+    	body{height:100%}
+		#container{height:100%}
+	</style>  
+  </head>
+	
+  <body>
+	 <div id="container"></div>
+	 
+	<script type="text/javascript"> 
+		// 百度地图API功能
+		var map = new BMap.Map("container", {mapType: BMAP_HYBRID_MAP});    // 创建Map实例
+		map.centerAndZoom(new BMap.Point(106.404, 39.915), 11);  // 初始化地图,设置中心点坐标和地图级别
+		//map.centerAndZoom("大兴", 15);  // 初始化地图,设置中心点坐标和地图级别
+		map.addControl(new BMap.MapTypeControl());   //添加地图类型控件
+		//map.setCurrentCity("北京");          // 设置地图显示的城市 此项是必须设置的
+		map.enableScrollWheelZoom(true);     //开启鼠标滚轮缩放
+		
+		var pt = new BMap.Point(106.404, 39.915);
+		
+		var myIcon = new BMap.Icon("../pic/fun.gif", new BMap.Size(60,60));
+		var myIcon1 = new BMap.Icon("../pic/风机-green1.png", new BMap.Size(60,60));
+		
+		var marker2 = new BMap.Marker(pt,{icon:myIcon});  // 创建标注
+		map.addOverlay(marker2);              // 将标注添加到地图中
+		
+		var label = new BMap.Label("",{offset:new BMap.Size(20,-10)});
+		marker2.setLabel(label);
+		
+		setInterval(function(){
+			label.setContent("有功功率：" + Math.round(Math.random()*100)/100);
+		}, 1000)
+		
+		// 编写自定义函数,创建标注
+		function addMarker(point){
+		  var marker = new BMap.Marker(point,{icon:myIcon1});
+		  map.addOverlay(marker);
+		}
+		
+		// 随机向地图添加25个标注
+		var bounds = map.getBounds();
+		var sw = bounds.getSouthWest();
+		var ne = bounds.getNorthEast();
+		var lngSpan = Math.abs(sw.lng - ne.lng);
+		var latSpan = Math.abs(ne.lat - sw.lat);
+		for (var i = 0; i < 25; i ++) {
+			var point = new BMap.Point(sw.lng + lngSpan * (Math.random() * 0.7), ne.lat - latSpan * (Math.random() * 0.7));
+			addMarker(point);
+		}
+	</script> 
+	
+	
+  </body>
+</html>

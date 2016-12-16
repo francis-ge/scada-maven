@@ -1,0 +1,129 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <base href="<%=basePath%>">
+    
+    <title></title>
+    
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	
+	<!-- easyUI -->
+	<link href="../jquery-easyui-1.5/themes/bootstrap/easyui.css" rel="stylesheet">
+	<link href="../jquery-easyui-1.5/themes/icon.css" rel="stylesheet">
+	
+	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) --> 
+	<script src="../jquery-easyui-1.5/jquery.min.js" charset="utf-8"></script>
+	
+	<!-- easyUI -->
+	<script src="../jquery-easyui-1.5/jquery.easyui.min.js" charset="utf-8"></script>
+	<script src="../jquery-easyui-1.5/locale/easyui-lang-zh_CN.js" charset="utf-8"></script>
+	
+	<style type="text/css">
+		* {margin: 0; padding: 0;}
+	</style>
+
+  </head>
+  
+  <body>
+
+		<table id ="datagrid" url="" idField="id" singleSelect="true" fit="true" striped="true" fitColumns="true" rownumbers="true">
+			<thead>   
+		        <tr>   
+		            <th data-options="field:'data',width:150,align:'center'">日期</th>
+		            <th data-options="field:'name',width:150,align:'center'">风机名称</th>  
+		            <th data-options="field:'a',width:120">发电量(kW)</th>  
+		            <th data-options="field:'b',width:120">平均风速(m/s)</th>  
+		            <th data-options="field:'c',width:120">平均功率(kW)</th>  
+		            <th data-options="field:'d',width:120">平均无功功率(KVar)</th>  
+		            <th data-options="field:'e',width:120">最大风速(m/s)</th>  
+		            <th data-options="field:'f',width:120">最大功率(kW)</th>  
+		            <th data-options="field:'g',width:120">可利用率</th>  
+		        </tr>   
+		    </thead>   
+		</table>
+		
+		<div id="toolBar" style="height:25px,overflow:hidden" >
+				<form id="from1" method="post" style="display: inline">   
+					选择年份:<input id="date" type="text" class="easyui-datebox" required="required"></input>
+					<a id="SubmitBtn" class="easyui-linkbutton" title="" href="javascript:void(0)" data-options="iconCls:'icon-search'">查询</a> 
+				</form>
+				<a id="saveBtn" href="#" class="easyui-linkbutton" data-options="iconCls:'icon-save'" style="display:inline-block;">导出</a>
+		</div>
+		<form id='form2' style='display:none' target='' method='post' action='' ajax='true'>
+			<input type='hidden' name='fields' />
+			<input type='hidden' name='titles' />
+			<input type='hidden' name='excelData' />
+		</form>
+		
+		<script type="text/javascript">
+			$(function(){
+				$('#datagrid').datagrid({
+					toolbar:'#toolBar'
+				});
+				
+		        $('#date').datebox({
+		            parser: function (s) {
+	            	   if (!s) return new Date();
+		               return new Date( parseInt(s,10), 0, 1);
+		            },
+		            
+		            formatter: function (d) { return d.getFullYear(); }
+		        });
+		        
+				$('#SubmitBtn').click(function(){
+					$('#datagrid').datagrid('loadData',{ total:0, rows:[] });
+
+					$('#datagrid').datagrid('load', serializeForm($('#from1')));
+					
+				}
+			);
+		        
+				$('#saveBtn').click(
+						function(){
+							$.messager.confirm('确认对话框', '确定要保存该报表吗？', function(r){
+								if (r){
+									//获取表头信息
+									var header = $('#datagrid').datagrid('options').columns[0];
+									var fields = "";
+									var titles = "";
+									for(var i = 0;i<header.length;i++){
+										var field = header[i].field;
+										var title = header[i].title;
+										var hiddenFlag = header[i].hidden;
+										
+										if(!hiddenFlag){
+											var dh = (i == (header.length -1) ? "" :",");
+											fields = fields + field + dh;
+											titles = titles + title + dh;
+										}
+									}
+
+									$.post('', function(data){
+										$('#form2').form('load',{fields:fields,titles:titles,excelData:data});
+										
+										$('#form2').form('submit',{url:'../excelFileAction'});
+									});
+									
+								}
+						})	
+					});
+				
+			})
+
+		//js方法：序列化表单 			
+		function serializeForm(form){
+			var obj = {};
+			$.each(form.serializeArray(),function(index){
+				if(obj[this['name']]){
+					obj[this['name']] = obj[this['name']] + ',' + this['value'];
+				} else {
+					obj[this['name']] = this['value'];
+				}
+			});
+			return obj;
+		}
+		
+	</script>
+  </body>
+
+</html>

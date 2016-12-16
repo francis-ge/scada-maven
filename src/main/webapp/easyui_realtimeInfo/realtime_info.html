@@ -1,0 +1,111 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+  <head>
+ 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <title></title>
+    
+	<!-- easyUI -->
+	<link href="../js/css/bootstrap.min.css" rel="stylesheet">
+	<link href="../jquery-easyui-1.5/themes/bootstrap/easyui.css" rel="stylesheet">
+	<link href="../jquery-easyui-1.5/themes/icon.css" rel="stylesheet">
+	
+	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) --> 
+	<script src="../jquery-easyui-1.5/jquery.min.js" charset="utf-8"></script>
+	
+	<!-- easyUI -->
+	<script src="../jquery-easyui-1.5/jquery.easyui.min.js" charset="utf-8"></script>
+	<script src="../jquery-easyui-1.5/locale/easyui-lang-zh_CN.js" charset="utf-8"></script>
+	
+	<script src="../js/bootstrap.min.js" charset="utf-8"></script>
+	
+	<style type="text/css">
+		* {margin: 0; padding: 0;}
+	</style>
+	
+	<script type="text/javascript">
+	
+		$(function(){
+			$.fn.extend({
+				refreshTable: function(data){
+				
+					 return this.each(function(){
+						 
+						var nameVals = $('.nameVal', this);
+						
+						nameVals.each(function(){
+							var name1 = $(this).attr('name');
+							$(this).next('td:first').html('<p>' + Math.round(data[name1]*100)/100  + '</p>');
+							$(this).next('td:first').attr('class','active');
+						});
+						
+						var nameStas = $('.nameSta', this);
+						
+						nameStas.each(function(){
+							var name2 = $(this).attr('name');
+							switch(data[name2]){
+							case true:
+								$(this).next('td:first').attr('class','success');
+								$(this).next('td:first').html('<p>' + data[name2] + '</p>');				
+								break;
+							case false:
+								$(this).next('td:first').attr('class','active');
+								$(this).next('td:first').html('<p>' + data[name2] + '</p>');				
+								break;
+							default:
+								$(this).next('td:first').attr('class','active');
+								$(this).next('td:first').html('<p>' + data[name2] + '</p>');
+							}
+						});
+						 
+					 });
+				}
+			});
+			
+			$('#datagrid').datagrid({
+				toolbar:'#toolBar',
+				loadMsg:''
+			});
+			
+			$('#funSelect').combobox({
+				onSelect:function(record){
+					
+				}
+			});
+			
+			$('#funSelect').combobox('select', 1);
+			
+			
+			setInterval(function(){
+				var tables = $("table");
+			
+				var funId = $('#funSelect').combobox('getValue');
+				
+				$.post('/scada/ajaxRealTimeInfo', {funId:funId}, function(data){
+					data = eval('('+data+')');
+					tables.refreshTable(data[0]);
+				});
+				
+			}, 1000 );
+			
+		})
+				
+	</script>
+  </head>
+  
+  <body>
+  	选择风机:
+	<select id="funSelect" style="width:200px;" url="/scada/ajaxAllfun" valueField="id" textField="name">
+	</select>
+	
+  	<div id="tabs" class="easyui-tabs"  fit="true" border="false" justified="true" pill="true"">  
+  		<div title = "传动链" 			href = 'realtime_info_drivingChain.html' >	</div>
+  		<div title = "变桨系统" 			href = 'realtime_info_pitch.html' >			</div>
+  		<div title = "变频系统" 			href = 'realtime_info_converter.html' >		</div>
+  		<div title = "偏航及液压系统" 	href = 'realtime_info_profi.html' >			</div>
+  		<div title = "辅助系统" 			href = 'realtime_info_assist.html' >		</div>
+	</div>
+
+  </body>
+  
+</html>

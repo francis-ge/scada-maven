@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<!-- Generated 2015-9-29 16:38:36 by Hibernate Tools 3.4.0.CR1 -->
+<hibernate-mapping>
+    <class name="com.sharpower.entity.PlcType" table="PLCTYPE">
+    	
+        <id name="id" type="java.lang.Integer">
+            <column name="ID" />
+            <generator class="native" />
+        </id>
+        
+        <property name="name" type="java.lang.String" not-null="true" unique="true">
+            <column name="NAME" />
+        </property>
+        
+        <many-to-one name="plcCommType" class="com.sharpower.entity.PlcCommType" fetch="join" lazy="false">
+            <column name="PLC_COMM_TYPE" />
+        </many-to-one>
+        
+        <bag name="variables" table="VARIABLE" lazy="true" fetch="join" inverse="false" order-by="id asc">
+            <key>
+                <column name="PLC_TYPE" />
+            </key>
+            
+            <one-to-many class="com.sharpower.entity.Variable" />
+        </bag>
+        
+        <bag name="funTroubleVariables" table="FUNTROUBLEVARIABLE" lazy="true" fetch="join" inverse="false" order-by="id asc">
+            <key>
+                <column name="PLC_TYPE" />
+            </key>
+            
+            <one-to-many class="com.sharpower.entity.FunTroubleVariable" />
+        </bag>
+        
+        <bag name="funs" table="FUN" lazy="true" fetch="join" inverse="false" order-by="id asc">
+           	<key>
+                <column name="PLC_TYPE" />
+            </key>
+            
+            <one-to-many class="com.sharpower.entity.Fun" />
+        </bag>
+        
+    </class>
+</hibernate-mapping>

@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<!-- Generated 2016-5-16 11:58:22 by Hibernate Tools 3.5.0.Final -->
+<hibernate-mapping>
+    <class name="com.sharpower.entity.Role" table="ROLE">
+        <id name="id" type="java.lang.Integer">
+            <column name="ID" />
+            <generator class="native" />
+        </id>
+        <property name="name" type="java.lang.String" not-null="true" unique="true">
+            <column name="NAME" />
+        </property>
+        <list name="users" table="USER" inverse="false" lazy="false" fetch="join">
+            <key>
+                <column name="ROLE" />
+            </key>
+            <list-index >
+				<column name="ID"></column>            
+            </list-index>
+            <one-to-many class="com.sharpower.entity.User" />
+        </list>
+        <list name="resources" table="ROLE_RES" inverse="false" lazy="false" fetch="join">
+            <key>
+                <column name="ROLE_ID" />
+            </key>
+            <list-index>
+				<column name="ID"></column>            
+            </list-index>
+            <many-to-many class="com.sharpower.entity.Resource" column="RES_ID" unique="false">
+            </many-to-many>
+        </list>
+    </class>
+</hibernate-mapping>

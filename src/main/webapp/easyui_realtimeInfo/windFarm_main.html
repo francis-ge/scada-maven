@@ -1,0 +1,168 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+  <head>
+ 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <title></title>
+    
+	<!-- easyUI -->
+	<link href="../jquery-easyui-1.5/themes/bootstrap/easyui.css" rel="stylesheet">
+	<link href="../jquery-easyui-1.5/themes/icon.css" rel="stylesheet">
+	
+	<style type="text/css">
+		* {margin: 0;padding:0}
+	</style>
+
+</head>
+<body style="overflow: hidden" >
+	<div id='funs' >
+    </div>
+    
+	<div id="menu" class="easyui-menu" style="width:120px;" hideOnUnhover="false">   
+	    <div id="1" data-options="iconCls:'icon-start'">启动</div>   
+	    <div id="2" data-options="iconCls:'icon-stop'">停机</div>   
+	    <div id="3" data-options="iconCls:'icon-service'">维护</div>   
+	    <div id="4" data-options="iconCls:'icon-reset'">复位</div>   
+	    <div class="menu-sep"></div>   
+	    <!-- <div id="5">偏航</div>  -->
+	</div>  
+	
+	<div id="window" class="easyui-window" title="偏航控制" style="width:600px;height:400px"
+		 data-options="modal:true" closed="true" >
+	</div>
+	
+	<form id="form" action="" method="post" style="display: none;">
+		<input type="text" name="fun.id" value="" />
+		<input type="text" name="fun.name" value="" />
+		<input type="text" name="fun.address" value="" />
+		<input type="hidden" name="fun.windFarm.id" value="1" />
+	</form>
+	
+	<!-- jQuery (necessary for Bootstrap's JavaScript plugins) --> 
+	<script src="../jquery-easyui-1.5/jquery.min.js" charset="utf-8"></script>
+	
+	<!-- easyUI -->
+	<script src="../jquery-easyui-1.5/jquery.easyui.min.js" charset="utf-8"></script>
+	<script src="../jquery-easyui-1.5/locale/easyui-lang-zh_CN.js" charset="utf-8"></script>
+	
+	<!-- velocity js动画框架 -->
+	<script src="../js/velocity.min.js" charset="utf-8"></script>
+	<script src="../js/velocity.ui.min.js" charset="utf-8"></script>
+
+	<script src="../js/jquery.easyui.extend.fundata.js" charset="utf-8"></script>
+	
+	<script type="text/javascript">
+		$(function(){
+			$.post('/scada/ajaxMainInfo',{},function(data){
+
+				for(var i in data){
+					$('#funs').append("<div class='easyui-fundata'></div>")
+				}
+				
+				$('.easyui-fundata').fundata(data);
+				$('.easyui-fundata').fundata('resize',data);
+			
+			},'json');
+			
+			setInterval(function(){
+				$.post('/scada/ajaxMainInfo',{},function(data){
+					$('.easyui-fundata').fundata('refresh',data);
+				},'json');
+			},1000);
+			
+			$(window).resize(function(){
+				$.post('/scada/ajaxMainInfo',{},function(data){
+					$('.easyui-fundata').fundata('resize',data);
+				},'json');
+			});
+			
+			$('#menu').menu({
+				onClick:function(item){
+					var selectRow = $('#datagrid').datagrid('getSelected');
+					
+					switch(item.id){
+					case '1':
+						if(selectRow!=null){
+							$('#form').form('load', {
+								'fun.id': selectRow.fun.id,
+								'fun.name' : selectRow.fun.name,
+								'fun.address': selectRow.fun.address
+							});
+							
+							$('#form').form('submit', {
+								url:'/scada/ajaxFunControlRun',
+								success: function(info){
+									info = eval("("+info+")");
+									$.messager.show({title:'我的消息',msg:info,showType:'slide'});
+								}
+							});
+						}
+						
+						break;
+					case '2':
+						if(selectRow!=null){
+							$('#form').form('load', {
+								'fun.id': selectRow.fun.id,
+								'fun.name' : selectRow.fun.name,
+								'fun.address': selectRow.fun.address
+							});
+							
+							$('#form').form('submit', {
+								url:'/scada/ajaxFunControlStop',
+								success: function(info){
+									info = eval("("+info+")");
+									$.messager.show({title:'我的消息',msg:info,showType:'slide'});
+								}
+							});
+						}
+						
+						break;
+					case '3':
+						if(selectRow!=null){
+							$('#form').form('load', {
+								'fun.id': selectRow.fun.id,
+								'fun.name' : selectRow.fun.name,
+								'fun.address': selectRow.fun.address
+							});
+							
+							$('#form').form('submit', {
+								url:'/scada/ajaxFunControlService',
+								success: function(info){
+									info = eval("("+info+")");
+									$.messager.show({title:'我的消息',msg:info,showType:'slide'});
+								}
+							});
+						}
+						
+						break;
+					case '4':
+						if(selectRow!=null){
+							$('#form').form('load',{
+								'fun.id': selectRow.fun.id,
+								'fun.name' : selectRow.fun.name,
+								'fun.address': selectRow.fun.address
+							});
+							
+							$('#form').form('submit', {
+								url:'/scada/ajaxFunControlReset',
+								success: function(info){
+									info = eval("("+info+")");
+									$.messager.show({title:'我的消息',msg:info,showType:'slide'});
+								}
+							});
+						}
+						
+						break;						
+					case '5':
+						$('#window').window('open');
+						break;
+					}
+				}
+			})
+			
+		})
+	</script>
+	
+</body>
+
+</html>
